@@ -1,5 +1,5 @@
 <?php
-namespace App\Service\utils;
+namespace Sentia\Utils;
 
 use Exception;
 

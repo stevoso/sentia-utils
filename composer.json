@@ -13,5 +13,16 @@
     ],
     "autoload": {
         "psr-4": { "Sentia\\Utils\\": "" }
+    },
+    "require": {
+        "ext-mbstring": "*",
+        "ext-iconv": "*",
+        "ext-dom": "*",
+        "ext-sodium": "*",
+        "ext-calendar": "*",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-zip": "*"
     }
 }
