@@ -1,0 +1,17 @@
+{
+    "name": "sentia/utils",
+    "type": "library",
+    "description": "Universal utils",
+    "keywords": ["sentia", "utils"],
+    "homepage": "https://sentia.sk",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sentia Community",
+            "email": "info@sentia.sk"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Sentia\\Utils\\": "" }
+    }
+}
