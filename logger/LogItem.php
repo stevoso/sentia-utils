@@ -18,6 +18,16 @@ class LogItem {
     public ?DateTime $dateTime;
     public string $message;
 
+    public function toArray(): array {
+        return [
+            'lineType' => $this->lineType,
+            'type' => $this->type,
+            'ip' => $this->ip,
+            'dateTime' => $this->dateTime->format("Y-m-d H:i:s"),
+            'message' => $this->message
+        ];
+    }
+
     /**
      * generuje retazec vhodny na zapis do suboru
      */
