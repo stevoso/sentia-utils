@@ -16,7 +16,7 @@ class LogItem {
     public int $type;
     public string $ip;
     public ?DateTime $dateTime;
-    public string $message;
+    public string $message = '';
 
     public function toArray(): array {
         return [
@@ -34,9 +34,9 @@ class LogItem {
     public function generateLogItem(): string {
         $ret = $this->lineType.'|'.$this->type.'|'.$this->dateTime->format("Y-m-d H:i:s").'|'.$this->ip;
         if($this->lineType === self::LINE_ONE){
-            $ret .= '|'.$this->message.'\n';
+            $ret .= '|'.$this->message."\n";
         }else{
-            $ret .= '\n'.$this->message;
+            $ret .= "\n".$this->message."\n";
         }
         return $ret;
     }

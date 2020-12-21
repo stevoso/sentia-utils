@@ -141,15 +141,15 @@ class Logger {
                     if($logItem->dateTime->format("Y-m-d H:i:s") >= $from->format("Y-m-d H:i:s")
                         && $logItem->dateTime->format("Y-m-d H:i:s") <= $till->format("Y-m-d H:i:s"))
                     {
-                        if($logItem === LogItem::LINE_MULTI){
-                            $logMultiline = $logItem;
+                        if($logItem->lineType === LogItem::LINE_MULTI){
+                            $logMultiline = clone $logItem;
                         }else{
                             $ret[] = $logItem;
                         }
                     }
                 }else{
                     if($logMultiline !== null){
-                        $logMultiline->message .= '\n'.$line;
+                        $logMultiline->message .= "\n".$line;
                     }
                 }
             }
