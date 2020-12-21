@@ -2,11 +2,8 @@
 namespace Sentia\Utils;
 
 class JsonUtil {
-    /**
-     * @param array $arr
-     * @return string
-     */
-    public function arrayToJson(array $arr){
+
+    public function arrayToJson(array $arr): string {
         return json_encode($arr, JSON_UNESCAPED_UNICODE);
     }
 
@@ -37,7 +34,6 @@ class JsonUtil {
     /**
      * @param $json
      * @param $key
-     * @return null
      */
     public function getItemFromJson($json, $key){
         $arr = $this->jsonToArray($json);

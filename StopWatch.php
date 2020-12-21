@@ -10,26 +10,17 @@ class StopWatch {
     private array $startTimes = [];
 
     /**
-     * StopWatch constructor.
-     */
-    public function __construct(){
-    }
-
-    /**
      * spustenie stopiek
-     * @param string $timerName
      */
-    public function start($timerName = 'default'){
+    public function start(string $timerName = 'default'): void {
         $this->startTimes[$timerName] = microtime(true);
     }
 
     /**
      * zastavenie stopiek, vracia ubehnuty cas od spustenia (v sekundach)
-     * @param string $timerName
      * @param int $round - pocet desatinnych miest na zaokruhlovanie. null-ak nechceme zaokruhlit, ale ponechat plny pocet desatrinnych miest
-     * @return mixed
      */
-    public function stop($timerName = 'default', $round = 2){
+    public function stop(string $timerName = 'default', int $round = 2): int {
         $elapsedTimeInSeconds = microtime(true) - $this->startTimes[$timerName];
         if($round !== null){
             $elapsedTimeInSeconds = round($elapsedTimeInSeconds, $round);

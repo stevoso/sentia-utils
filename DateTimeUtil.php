@@ -16,11 +16,8 @@ class DateTimeUtil {
      * -1 .. $date1 < $date2
      *  0 .. $date1 = $date2
      *  1 .. $date1 < $date2
-     * @param DateTime|null $date1
-     * @param DateTime|null $date2
-     * @return int
      */
-    public function compareDates(DateTime $date1 = null, DateTime $date2 = null){
+    public function compareDates(DateTime $date1 = null, DateTime $date2 = null): int {
         $s1 = $date1 != null ? $date1->format('Y-m-d') : '';
         $s2 = $date2 != null ? $date2->format('Y-m-d') : '';
         return ($s1 < $s2) ? -1 : ($s1 == $s2 ? 0 : 1);
@@ -31,11 +28,8 @@ class DateTimeUtil {
      * -1 .. $date1 < $date2
      *  0 .. $date1 = $date2
      *  1 .. $date1 < $date2
-     * @param DateTime|null $dateTime1
-     * @param DateTime|null $dateTime2
-     * @return int
      */
-    public function compareDateTimes(DateTime $dateTime1 = null, DateTime $dateTime2 = null){
+    public function compareDateTimes(DateTime $dateTime1 = null, DateTime $dateTime2 = null): int {
         $s1 = $dateTime1 !== null ? $dateTime1->format('Y-m-d H:i:s') : '';
         $s2 = $dateTime2 !== null ? $dateTime2->format('Y-m-d H:i:s') : '';
         return ($s1 < $s2) ? -1 : ($s1 == $s2 ? 0 : 1);
@@ -61,10 +55,8 @@ class DateTimeUtil {
     /**
      * skonvertuje string na DateTime, alebo null, ak nie je alebo je zle zadany.
      * Value moze byt napr. '1.1.2001', '01.01.2001', '31.12.2001', ' 31. 12 . 2001'
-     * @param $theValue
-     * @return DateTime|null
      */
-    public function stringToDateTime($theValue){
+    public function stringToDateTime($theValue): ?DateTime {
         if (strlen($theValue) < 8){ // minimum je 8 znakov - '1.1.2001'
             return null;
         }
@@ -138,7 +130,7 @@ class DateTimeUtil {
     /**
      * vracia (true), ak je retazec platnym datumom (napr.: 14.5.2017), vracia (false) ak retazec nie je platny datum.
      */
-    public function isDate($text){
+    public function isDate(string $text): bool {
         $pieces = explode(".", $text);
         $den = isset($pieces[0]) ? $pieces[0] : "";
         $mesiac = isset($pieces[1]) ? $pieces[1] : "";
@@ -149,11 +141,8 @@ class DateTimeUtil {
 
     /**
      * vracia rozdiel medzi dvoma datumami v dnoch
-     * @param DateTime $datetime1
-     * @param DateTime $datetime2
-     * @return int
      */
-    public function differenceDays(DateTime $datetime1, DateTime $datetime2){
+    public function differenceDays(DateTime $datetime1, DateTime $datetime2): int {
         $interval = $datetime1->diff($datetime2);
         return (int)$interval->format('%a');
     }
@@ -192,4 +181,19 @@ class DateTimeUtil {
         return $ret;
     }
 
+    /**
+     * vracia pole rokov medzi datumami
+     */
+    public function getYearsFromInterval(DateTime $dateFrom, DateTime $dateTill): array {
+        if($dateFrom->format("Y") === $dateTill->format("Y")){
+            return [(int)$dateFrom->format("Y")];
+        }
+        $ret = [];
+        $yearFrom = (int)$dateFrom->format("Y") < (int)$dateTill->format("Y") ? (int)$dateFrom->format("Y") : (int)$dateTill->format("Y");
+        $yearTill = (int)$dateFrom->format("Y") > (int)$dateTill->format("Y") ? (int)$dateFrom->format("Y") : (int)$dateTill->format("Y");
+        for($i=$yearFrom; $i<=$yearTill; $i++){
+            $ret[] = $i;
+        }
+        return $ret;
+    }
 }

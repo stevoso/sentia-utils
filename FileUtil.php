@@ -19,12 +19,6 @@ class FileUtil {
         $this->stringUtils = $stringUtils;
     }
 
-    /*
-    private function getAllExtensions(){
-        return array_merge(self::$EXTENSIONS_DOC, self::$EXTENSIONS_IMG, self::$EXTENSIONS_VIDEO, self::$EXTENSIONS_PACKAGE, self::$EXTENSIONS_OTHER);
-    }
-    */
-
     //------------------ extension -------------------
     /**
      * @param $filename
@@ -61,26 +55,21 @@ class FileUtil {
 
     /**
      * vracia pole s nazvami suborov a adresarov
-     * @param $dir
-     * @return array
      */
-    public function getFilesAndDirs($dir){
+    public function getFilesAndDirs(string $dir): array {
         return array_diff(scandir($dir), ['..', '.']);
     }
 
     /**
-     * vracia pole suborov, ktore vyhovuju pozadovanej koncovke suboru. Ak null, tak vracia vsetky subory.
-     * @param $dir
-     * @param null $expectedExtension
-     * @return array
+     * vracia pole suborov, ktore vyhovuju pozadovanej koncovke suboru. Ak null, tak vracia vsetky subory. '.' a '..' sý vynechané.
      */
-    public function getFiles($dir, $expectedExtension = null){
+    public function getFiles($dir, $expectedExtension = null): array {
         $filesDirs = $this->getFilesAndDirs($dir);
         $files = [];
         foreach($filesDirs as $fileDir){
             if(is_file($dir.'/'.$fileDir)){
                 $extension = $this->getExtension($fileDir);
-                if($expectedExtension === null || ($expectedExtension !== null && mb_strtolower($expectedExtension) == mb_strtolower($extension))){
+                if($expectedExtension === null || (mb_strtolower($expectedExtension) == mb_strtolower($extension))){
                     $files[] = $fileDir;
                 }
             }
@@ -89,10 +78,9 @@ class FileUtil {
     }
 
     /**
-     * @param $filenameIn
      * @return string - basename vid. splitFilename()
      */
-    public function getBasename($filenameIn){
+    public function getBasename($filenameIn): string {
         $path = $baseName = $filename = $extension = null;
         $this->splitFilename($filenameIn, $path, $baseName, $filename, $extension);
         return $baseName;
@@ -102,7 +90,7 @@ class FileUtil {
      * @param $filenameIn
      * @return string - filename vid. splitFilename()
      */
-    public function getFilename($filenameIn){
+    public function getFilename($filenameIn): string {
         $path = $baseName = $filename = $extension = null;
         $this->splitFilename($filenameIn, $path, $baseName, $filename, $extension);
         return $filename;
@@ -154,7 +142,7 @@ class FileUtil {
         return $size;
     }
 
-    public function formatDiscSize($bytes){
+    public function formatDiscSize($bytes): string {
         if ($bytes >= 1099511627776){
             $bytes = number_format($bytes / 1099511627776, 2) . ' TB';
         }elseif ($bytes >= 1073741824){
@@ -180,7 +168,7 @@ class FileUtil {
      * @param $filenameTo
      * @throws \Exception
      */
-    public function copy($filenameFrom, $filenameTo){
+    public function copy($filenameFrom, $filenameTo): bool {
         if(!file_exists($filenameFrom)){
             throw new \Exception('Neexistuje subor \'' . $filenameFrom . '\'!');
         }
@@ -283,12 +271,13 @@ class FileUtil {
 
     //------------------ generateRandomFilename -------------------
     /**
+     * TODO pouzitie nahradit cez UUID
      * Vygeneruje nahodny filename (aky este neexistuje).
      * @param $path
      * @param $extension
      * @return string
      */
-    public function generateRandomFilename($path, $extension){
+    public function generateRandomFilename($path, $extension) : string {
         do{
             $extension2 = empty($extension) ? '' : '.' . $extension;
             $filename = $path . '/' . uniqid('', true) . mt_rand() . $extension2;
@@ -317,10 +306,9 @@ class FileUtil {
      * @param $extension - bez bodky
      * @param $data
      * @param int $flags
-     * @return string
      * @throws \Exception
      */
-    public function generateRandomFilenameAndPutContents($path, $extension, $data, $flags = 0){
+    public function generateRandomFilenameAndPutContents($path, $extension, $data, $flags = 0): string {
         $filename = $this->generateRandomFilename($path, $extension);
         $this->filePutContents($filename, $data);
         return $filename;
@@ -331,9 +319,8 @@ class FileUtil {
      *
      * @param $filename - filename aj s cestou
      * @param $filenameClient - filename pre clienta
-     * @return Response
      */
-    public function download($filename, $filenameClient){
+    public function download($filename, $filenameClient): Response {
         // response
         $response = new Response();
         // header
@@ -403,33 +390,42 @@ class FileUtil {
      * create directories: ww/xx/yy/zz/uuid ... only if directories does not exist
      * $basePath - without '/' at the end
      */
-    public function createDirsForUuid4(string $basePath, string $uuid):string{
+    public function createDirsForUuid4(string $basePath, string $uuid, bool $includeUUidDir = true):string{
         $dirPart1 = $uuid[0].$uuid[1];
         $dirPart2 = $uuid[2].$uuid[3];
         $dirPart3 = $uuid[4].$uuid[5];
         $dirPart4 = $uuid[6].$uuid[7];
-        if(!$this->isDir($basePath.'/'.$dirPart1)){
-            $this->createDir($basePath.'/'.$dirPart1);
+
+        $basePath .= '/'.$dirPart1;
+        if(!$this->isDir($basePath)){
+            $this->createDir($basePath);
         }
-        if(!$this->isDir($basePath.'/'.$dirPart1.'/'.$dirPart2)){
-            $this->createDir($basePath.'/'.$dirPart1.'/'.$dirPart2);
+
+        $basePath .= '/'.$dirPart2;
+        if(!$this->isDir($basePath)){
+            $this->createDir($basePath);
         }
-        if(!$this->isDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3)){
-            $this->createDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3);
+
+        $basePath .= '/'.$dirPart3;
+        if(!$this->isDir($basePath)){
+            $this->createDir($basePath);
         }
-        if(!$this->isDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4)){
-            $this->createDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4);
+
+        $basePath .= '/'.$dirPart4;
+        if(!$this->isDir($basePath)){
+            $this->createDir($basePath);
         }
-        if(!$this->isDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4.'/'.$uuid)){
-            $this->createDir($basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4.'/'.$uuid);
+        if($includeUUidDir){
+            $basePath .= '/'.$uuid;
+            if(!$this->isDir($basePath)){
+                $this->createDir($basePath);
+            }
         }
-        return $basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4.'/'.$uuid;
+        return $basePath;
     }
 
     /**
      * use this method if uuid file is deleted. Empty folders will be deleted
-     * @param string $basePath
-     * @param string $uuid
      */
     public function clearUuid4Dirs(string $basePath, string $uuid):void{
         $dirPart1 = $uuid[0].$uuid[1];
@@ -458,14 +454,16 @@ class FileUtil {
         }
     }
 
-    public function getPathByUuid(string $basePath, string $uuid): ?string
-    {
+    public function getPathByUuid(string $basePath, string $uuid, bool $includeUuidDir = true): ?string {
         $dirPart1 = $uuid[0] . $uuid[1];
         $dirPart2 = $uuid[2] . $uuid[3];
         $dirPart3 = $uuid[4] . $uuid[5];
         $dirPart4 = $uuid[6] . $uuid[7];
 
-        $path = $basePath . '/' . $dirPart1 . '/' . $dirPart2 . '/' . $dirPart3 . '/' . $dirPart4 . '/' . $uuid;
+        $path = $basePath . '/' . $dirPart1 . '/' . $dirPart2 . '/' . $dirPart3 . '/' . $dirPart4;
+        if($includeUuidDir){
+            $path .= '/' . $uuid;
+        }
         return $this->isDir($path) ? $path : null;
     }
 }
