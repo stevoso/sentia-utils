@@ -160,4 +160,20 @@ class Logger {
             }
         }
     }
+
+    /**
+     * vymazanie celeho adresara alebo suboru identifikovaneho podla $uuid
+     */
+    public function deleteLog(string $basePath, Uuid $uuid): void {
+        $baseDir = $this->fileUtil->getPathByUuid($basePath, $uuid->toRfc4122(), false);
+        if(file_exists($baseDir.'/'.$uuid->toRfc4122().'.log')){
+            $this->fileUtil->delete($baseDir.'/'.$uuid->toRfc4122().'.log');
+        }
+
+        if(is_dir($baseDir.'/'.$uuid->toRfc4122())){
+            $this->fileUtil->deleteDir($baseDir.'/'.$uuid->toRfc4122());
+        }
+
+        $this->fileUtil->clearUuid4Dirs($basePath, $uuid->toRfc4122());
+    }
 }
