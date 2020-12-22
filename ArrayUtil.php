@@ -125,10 +125,18 @@ class ArrayUtil {
         return $xs;
     }
 
-    public function getKeyToValueFromItems(array $items, $keyMember, $valueMember){
-        $xs = array();
+    public function getKeyToValueFromItems(array $items, $keyMember, $valueMember): array{
+        $xs = [];
         foreach($items as $item){
             $xs[$item->$keyMember] = $item->$valueMember;
+        }
+        return $xs;
+    }
+
+    public function getKeyToValueFromItems_eval(array $items, $keyMember, $valueMember): array {
+        $xs = [];
+        foreach($items as $item){
+            eval('$xs[$item->'.$keyMember.'] = $item->'.$valueMember.';');
         }
         return $xs;
     }
@@ -272,7 +280,7 @@ class ArrayUtil {
         return true;
     }
 
-        /**
+    /**
      * simple key, value array converts to url query string
      * keys must be safe, without special characters
      */

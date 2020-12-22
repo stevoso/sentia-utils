@@ -4,19 +4,15 @@ namespace Sentia\Utils;
 class VehicleUtil {
     /**
      * vracia true, ak $vin ma korektny format: musi mat 17 znakov a nesmie obsahovat znaky I, O, Q
-     * @param $vin
-     * @return bool
      */
-    public function isVinValid($vin):bool{
+    public function isVinValid(string $vin):bool{
         return (strlen($vin) == 17 && !strpos($vin, 'I') && !strpos($vin, 'O') && !strpos($vin, 'Q'));
     }
 
     /**
      * true, if valid ECV was entered. Otherwise false
-     * @param $ecv
-     * @return bool
      */
-    public function isValidEcv($ecv):bool{
+    public function isValidEcv(string $ecv):bool{
         $ret = true;
         if(mb_strlen($ecv) > 0 && mb_strlen($ecv) != 6 && mb_strlen($ecv) != 7){
             $ret = false;
@@ -26,10 +22,8 @@ class VehicleUtil {
 
     /**
      * true, if valid number of TP was entered. Otherwise false
-     * @param $tp
-     * @return bool
      */
-    public function isValidTp($tp):bool{
+    public function isValidTp(string $tp):bool{
         $ret = true;
         if(mb_strlen($tp) > 0 && (mb_strlen($tp) != 8)){
             $ret = false;
@@ -39,6 +33,9 @@ class VehicleUtil {
 
     public function getDimensionAndTypeOfTyreAxle(string $dimensionAndTypeOfTyreAxle): array {
         $res = [];
+        if ($dimensionAndTypeOfTyreAxle == null || $dimensionAndTypeOfTyreAxle == '') {
+            return $res;
+        }
         $data = str_replace(['(', ')','*', ','], '', $dimensionAndTypeOfTyreAxle);
         $data = str_replace('  ', ' ', $data);
         $data = explode('/', $data);
@@ -90,6 +87,9 @@ class VehicleUtil {
 
     public function getRimDimensionsOnAxle(string $rimDimensionsOnAxle): array {
         $res = [];
+        if ($rimDimensionsOnAxle == null || $rimDimensionsOnAxle == '') {
+            return $res;
+        }
         $formattedString = str_replace([' ', 'X', '(', ')'], '', $rimDimensionsOnAxle);
         $formattedString = str_replace(',', '.', $formattedString);
         $formattedString = str_replace('1/2', '.5', $formattedString);
