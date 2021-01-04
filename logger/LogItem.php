@@ -15,6 +15,7 @@ class LogItem {
     public int $lineType;
     public int $type;
     public string $ip;
+    public string $title;
     public ?DateTime $dateTime;
     public string $message = '';
 
@@ -23,6 +24,7 @@ class LogItem {
             'lineType' => $this->lineType,
             'type' => $this->type,
             'ip' => $this->ip,
+            'title' => $this->title,
             'dateTime' => $this->dateTime->format("Y-m-d H:i:s"),
             'message' => $this->message
         ];
@@ -32,7 +34,7 @@ class LogItem {
      * generuje retazec vhodny na zapis do suboru
      */
     public function generateLogItem(): string {
-        $ret = $this->lineType.'|'.$this->type.'|'.$this->dateTime->format("Y-m-d H:i:s").'|'.$this->ip;
+        $ret = $this->lineType.'|'.$this->type.'|'.$this->dateTime->format("Y-m-d H:i:s").'|'.$this->ip.'|'.$this->title;
         if($this->lineType === self::LINE_ONE){
             $ret .= '|'.$this->message."\n";
         }else{
@@ -51,8 +53,9 @@ class LogItem {
         $logItem->type = isset($arr[1]) ? (int)$arr[1] : 0;
         $logItem->dateTime = isset($arr[2]) ? new DateTime($arr[2]) : null;
         $logItem->ip = isset($arr[3]) ? $arr[3] : '';
-        if($logItem->lineType === LogItem::LINE_ONE && isset($arr[4])){
-            $logItem->message = implode('|', array_slice($arr, 4));
+        $logItem->title = isset($arr[4]) ? $arr[4] : '';
+        if($logItem->lineType === LogItem::LINE_ONE && isset($arr[5])){
+            $logItem->message = implode('|', array_slice($arr, 5));
         }
         return $logItem;
     }

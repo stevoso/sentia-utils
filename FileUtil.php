@@ -204,23 +204,21 @@ class FileUtil {
     }
 
     /**
-     * @param $filename
-     * @throws \Exception
+     * delete one file
      */
-    public function delete($filename){
+    public function delete(string $filename): bool {
         if(file_exists($filename)){
             if(!unlink($filename)){
-                throw new \Exception('Subor \'' . $filename . '\' sa nepodarilo zmazat!');
+                return false;
             }
         }
+        return true;
     }
 
     /**
      * delete directory recursivelly
-     * @param $dir
-     * @return bool
      */
-    public function deleteDir($dir){
+    public function deleteDir(string $dir): bool {
         $files = array_diff(scandir($dir), array('.','..'));
         foreach ($files as $file) {
             (is_dir($dir.'/'.$file)) ? $this->deleteDir($dir.'/'.$file) : unlink($dir.'/'.$file);
@@ -230,9 +228,8 @@ class FileUtil {
 
     /**
      * z adresara vymaze vsetky subory a adresare. Zakladny vstupny adresar ponecha
-     * @param $dir
      */
-    public function emptyDir($dir){
+    public function emptyDir(string $dir): void {
         $files = array_diff(scandir($dir), array('.','..'));
         foreach ($files as $file) {
             (is_dir($dir.'/'.$file)) ? $this->deleteDir($dir.'/'.$file) : unlink($dir.'/'.$file);
@@ -240,24 +237,31 @@ class FileUtil {
     }
 
     //------------------ dir -------------------
-    public function isDir($dirname){
+    public function isDir(string $dirname): bool {
         return is_dir($dirname);
     }
 
     /**
      * skontroluje, ci adresar existuje. Ak nie, tak ho vytvori.
      * @param $dirname
+     * @deprecated [4.1.2021] Pouzit metodu mkdirIfNotExists
      */
-    public function checkDirExistence($dirname){
+    public function checkDirExistence(string $dirname){
         if(!file_exists($dirname)){
             mkdir($dirname);
         }
+    }
+    public function mkdirIfNotExists(string $dirname): bool {
+        if(!is_dir($dirname)){
+            return mkdir($dirname);
+        }
+        return true;
     }
 
     /**
      * vytvori adresar
      * @param $dirname - cesta k pozadovanemu adresaru, na konci nesmie byt lomitko
-     * @param bool $strict - ak true, tak pri existencii adresara vyhodi exceptionu
+     * @deprecated [4.1.2021] Pouzit metodu mkdirIfNotExists
      */
     public function createDir(string $dirname):bool{
         // kontrola, ci adresar uz existuje

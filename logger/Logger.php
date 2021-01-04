@@ -20,16 +20,16 @@ class Logger {
     }
 
     // ### log by date ###
-    public function addLineByDate(string $basePath, Uuid $uuid, string $message, int $type = LogItem::TYPE_DEFAULT): void {
-        $this->logByDate($message, $uuid, LogItem::LINE_ONE, $type, $basePath);
+    public function addLineByDate(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+        $this->logByDate($title, $message, $uuid, LogItem::LINE_ONE, $type, $basePath);
     }
 
-    public function addLinesByDate(string $basePath, Uuid $uuid, string $message, int $type = LogItem::TYPE_DEFAULT): void {
-        $this->logByDate($message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
+    public function addLinesByDate(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+        $this->logByDate($title, $message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
     }
 
-    private function logByDate(string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
-        $logItem = $this->prepareLogItem($message, $lineType, $type, $basePath);
+    private function logByDate(string $title, string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
+        $logItem = $this->prepareLogItem($title, $message, $lineType, $type, $basePath);
         // prepare subdirs by Uuid
         $finalPath = $this->fileUtil->createDirsForUuid4($basePath, $uuid->toRfc4122());
         $finalPath .= '/'.$logItem->dateTime->format('Y');
@@ -41,24 +41,25 @@ class Logger {
     }
 
     // ### log by UUID ###
-    public function addLineByUuid(string $basePath, Uuid $uuid, string $message, int $type = LogItem::TYPE_DEFAULT): void {
-        $this->logByUuid($message, $uuid, LogItem::LINE_ONE, $type, $basePath);
+    public function addLineByUuid(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+        $this->logByUuid($title, $message, $uuid, LogItem::LINE_ONE, $type, $basePath);
     }
 
-    public function addLinesByUuid(string $basePath, Uuid $uuid, string $message, int $type = LogItem::TYPE_DEFAULT): void {
-        $this->logByUuid($message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
+    public function addLinesByUuid(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+        $this->logByUuid($title, $message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
     }
 
-    private function logByUuid(string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
-        $logItem = $this->prepareLogItem($message, $lineType, $type, $basePath);
+    private function logByUuid(string $title, string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
+        $logItem = $this->prepareLogItem($title, $message, $lineType, $type, $basePath);
         // prepare subdirs by Uuid
         $finalPath = $this->fileUtil->createDirsForUuid4($basePath, $uuid->toRfc4122(), false);
         $finalPath .= '/'.$uuid->toRfc4122().'.log';
         file_put_contents($finalPath, $logItem->generateLogItem(), FILE_APPEND | LOCK_EX);
     }
 
-    private function prepareLogItem(string $message, int $lineType, int $type, string $basePath):LogItem{
+    private function prepareLogItem(string $title, string $message, int $lineType, int $type, string $basePath):LogItem{
         $logItem = new LogItem();
+        $logItem->title = $title;
         $logItem->message = $message;
         $logItem->lineType = $lineType;
         $logItem->dateTime = new DateTime();
@@ -68,6 +69,7 @@ class Logger {
         if(!is_dir($basePath)){
             $logItem->type = LogItem::TYPE_ERROR;
             $logItem->lineType = LogItem::LINE_ONE;
+            $logItem->title = 'Chyba';
             $logItem->message = 'Base path neexistuje: '.$basePath;
         }
         return $logItem;
