@@ -466,4 +466,16 @@ class FileUtil {
         }
         return $this->isDir($path) ? $path : null;
     }
+    
+    /**
+     * @param $file
+     * @param $text
+     */
+    public function writeToEnd($file, $text){
+        if($handle = fopen($file, 'a')){
+            fwrite($handle, $text);
+            fclose($handle);
+        }
+    }
+
 }
