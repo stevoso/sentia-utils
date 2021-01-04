@@ -86,7 +86,7 @@ class Logger {
 
         $finalPath = $this->fileUtil->getPathByUuid($basePath, $uuid->toRfc4122());
         if(!is_dir($finalPath)){
-            throw new Exception('Cesta k adresáru neexistuje:'.$finalPath);
+            return[];
         }
 
         $ret = [];

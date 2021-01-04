@@ -12,9 +12,9 @@ class VehicleUtil {
     /**
      * true, if valid ECV was entered. Otherwise false
      */
-    public function isValidEcv(string $ecv):bool{
+    public function isValidEcv(?string $ecv):bool{
         $ret = true;
-        if(mb_strlen($ecv) > 0 && mb_strlen($ecv) != 6 && mb_strlen($ecv) != 7){
+        if($ecv === null || (mb_strlen($ecv) > 0 && mb_strlen($ecv) != 6 && mb_strlen($ecv) != 7)){
             $ret = false;
         }
         return $ret;
@@ -23,9 +23,9 @@ class VehicleUtil {
     /**
      * true, if valid number of TP was entered. Otherwise false
      */
-    public function isValidTp(string $tp):bool{
+    public function isValidTp(?string $tp):bool{
         $ret = true;
-        if(mb_strlen($tp) > 0 && (mb_strlen($tp) != 8)){
+        if($tp === null || (mb_strlen($tp) > 0 && mb_strlen($tp) != 8)){
             $ret = false;
         }
         return $ret;

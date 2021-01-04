@@ -57,7 +57,10 @@ class FileUtil {
      * vracia pole s nazvami suborov a adresarov
      */
     public function getFilesAndDirs(string $dir): array {
-        return array_diff(scandir($dir), ['..', '.']);
+        if(is_dir($dir)){
+            return array_diff(scandir($dir), ['..', '.']);
+        }
+        return [];
     }
 
     /**
