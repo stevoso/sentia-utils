@@ -12,6 +12,13 @@ class LogItem {
     const TYPE_ERROR = 3;
     const TYPE_SYSTEM_ERROR = 4; // pri tejto chybe by mohol ist napriklad email, aby sme vedeli o tejto chybe co najskor
 
+    private static array $colors = [
+        self::TYPE_DEFAULT => '#000000',
+        self::TYPE_WARNING => '#f7aa04',
+        self::TYPE_ERROR => '#db0a0a',
+        self::TYPE_SYSTEM_ERROR => '#bb029a',
+    ];
+
     public int $lineType;
     public int $type;
     public string $ip;
@@ -41,6 +48,10 @@ class LogItem {
             $ret .= "\n".$this->message."\n";
         }
         return $ret;
+    }
+
+    public function getColor():string{
+        return self::$colors[$this->type];
     }
 
     /**
