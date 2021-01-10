@@ -251,9 +251,21 @@ class FileUtil {
             mkdir($dirname);
         }
     }
-    public function mkdirIfNotExists(string $dirname): bool {
-        if(!is_dir($dirname)){
-            return mkdir($dirname);
+
+    /**
+     * na vstupe by mala byt validna adresarova cesta, napr: x/y/z/u
+     * metoda skontroluje danu adresarovu struktutu a ak adresare neexistuju, tak sa vytvoria
+     */
+    public function mkdirIfNotExists(string $dirPath): bool {
+        $parts = explode('/', $dirPath);
+        if(($count = count($parts)) > 1){
+            $path = $parts[0];
+            for($i=1; $i<$count; $i++){
+                $path .= '/'.$parts[$i];
+                if(!is_dir($path) && !mkdir($path)){
+                    return false;
+                }
+            }
         }
         return true;
     }
