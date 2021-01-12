@@ -3,8 +3,6 @@ namespace Sentia\Utils;
 
 /**
  * PHP stopky, je mozne zapnut viac stopiek
- * Class StopWatch
- * @package Sentia\UtilsBundle\Lib
  */
 class StopWatch {
     private array $startTimes = [];

@@ -33,7 +33,7 @@ class BitUtil {
         return $value & ~$x;
     }
 
-    public function setBitValue(int $intValue, int $position, $bitValue){
+    public function setBitValue(int $intValue, int $position, bool $bitValue): int {
         return $bitValue ? $this->setBit($intValue, $position) : $this->unsetBit($intValue, $position);
     }
 
@@ -42,11 +42,11 @@ class BitUtil {
      * SetBit()).
      * Pouzi napr. takto: SetBits(Value, Position1, Position2,...)
      */
-    public function setBits(){
+    public function setBits(): ?int {
         $args = func_get_args();
         $count = count($args);
         if($count < 2){
-            throw new \Exception('Malo argumentov!');
+            return null; // malo argumentov!
         }
         $value = $args[0];
         for($i = 1; $i < $count; $i++){
@@ -60,11 +60,11 @@ class BitUtil {
      * SetBit()).
      * Pouzi napr. takto: SetBits(Value, Position1, Position2,...)
      */
-    public function unsetBits(){
+    public function unsetBits(): ?int {
         $args = func_get_args();
         $count = count($args);
         if($count < 2){
-            throw new \Exception('Malo argumentov!');
+            return null; // Malo argumentov!
         }
         $value = $args[0];
         for($i = 1; $i < $count; $i++){
@@ -78,11 +78,11 @@ class BitUtil {
      * @param $positions - array(int - position)
      * @param $positionsAllowed - array(int - position) - povolene pozicie
      */
-    public function setBitsByPositions(array &$positions, array &$positionsAllowed){
+    public function setBitsByPositions(array &$positions, array &$positionsAllowed): int {
         $x = 0;
         foreach($positions as $position){
             if(!in_array($position, $positionsAllowed)){
-                throw new \Exception('Nepovolena position=\'' . $position . '\'!');
+                continue;
             }
             $x = $this->setBit($x, $position);
         }
@@ -92,7 +92,7 @@ class BitUtil {
     /**
      * Ako setBitsByPositions(), ale nekontroluje positionsAllowed.
      */
-    public function setBitsByPositionsDoNotCheckAllowed(array $positions){
+    public function setBitsByPositionsDoNotCheckAllowed(array $positions): int {
         $x = 0;
         foreach($positions as $position){
             $x = $this->setBit($x, $position);
@@ -105,8 +105,8 @@ class BitUtil {
      * @param $value - int - s nastavenymi bitmi
      * @param $positionsAllowed - array(int - position) - povolene pozicie
      */
-    public function getPositions($value, array &$positionsAllowed){
-        $ps = array();
+    public function getPositions($value, array &$positionsAllowed): array {
+        $ps = [];
         $x = 1;
         for($p = 0; $p <= 30; $p++){
             if($value < $x){
@@ -114,7 +114,7 @@ class BitUtil {
             }
             if(($value & $x) != 0){
                 if(!in_array($p, $positionsAllowed)){
-                    throw new \Exception('Nepovolena position=\'' . $p . '\'!');
+                    continue;
                 }
                 $ps[] = $p;
             }
@@ -123,21 +123,4 @@ class BitUtil {
         return $ps;
     }
 
-    /**
-     * Ako GetPositions(), ale nekontroluje positionsAllowed.
-     */
-    public function getPositionsDoNotCheckAllowed($value){
-        $ps = array();
-        $x = 1;
-        for($p = 0; $p <= 30; $p++){
-            if($value < $x){
-                break;
-            }
-            if(($value & $x) != 0){
-                $ps[] = $p;
-            }
-            $x = $x << 1;
-        }
-        return $ps;
-    }
 }

@@ -3,6 +3,7 @@ namespace Sentia\Utils;
 
 use FilesystemIterator;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\Uuid;
 
 class FileUtil {
     private StringUtil $stringUtils;
@@ -50,7 +51,7 @@ class FileUtil {
         $path = $s['dirname'];
         $baseName = $s['basename'];
         $filename = $s['filename'];
-        $extension = array_key_exists('extension', $s) ? $s['extension'] : null;
+        $extension = array_key_exists('extension', $s) ? $s['extension'] : '';
     }
 
     /**
@@ -83,17 +84,16 @@ class FileUtil {
     /**
      * @return string - basename vid. splitFilename()
      */
-    public function getBasename($filenameIn): string {
+    public function getBasename(string $filenameIn): string {
         $path = $baseName = $filename = $extension = null;
         $this->splitFilename($filenameIn, $path, $baseName, $filename, $extension);
         return $baseName;
     }
 
     /**
-     * @param $filenameIn
      * @return string - filename vid. splitFilename()
      */
-    public function getFilename($filenameIn): string {
+    public function getFilename(string $filenameIn): string {
         $path = $baseName = $filename = $extension = null;
         $this->splitFilename($filenameIn, $path, $baseName, $filename, $extension);
         return $filename;
@@ -103,36 +103,19 @@ class FileUtil {
      *
      * @return string - extension bez bodky.
      */
-    public function getExtension($filename){
+    public function getExtension(string $filename): string {
         $this->splitFilename($filename, $path, $baseName, $filename2, $extension);
         return $extension;
     }
 
     /**
      * vracia formatovanu velkost suboru v bytoch|KB|MB|GB|TB
-     * @param $fileName
-     * @return int|null|string
      */
-    public function getFileSizeFormatted($fileName){
-        $bytes = null;
+    public function getFileSizeFormatted(string $fileName): string {
+        $bytes = '';
         if(file_exists($fileName)){
             $bytes = filesize($fileName);
-            if ($bytes >= 1099511627776){
-                $bytes = number_format($bytes / 1099511627776, 2) . ' TB';
-            }elseif ($bytes >= 1073741824){
-                $bytes = number_format($bytes / 1073741824, 2) . ' GB';
-            }elseif ($bytes >= 1048576){
-                $bytes = number_format($bytes / 1048576, 2) . ' MB';
-            }elseif ($bytes >= 1024){
-                $bytes = number_format($bytes / 1024, 2) . ' KB';
-            }elseif ($bytes > 1){
-                $bytes = $bytes . ' bytes';
-            }elseif ($bytes == 1){
-                $bytes = $bytes . ' byte';
-            }else{
-                $bytes = '0 bytes';
-            }
-            $bytes = str_replace('.', ',', $bytes);
+            $bytes = $this->formatDiscSize($bytes);
         }
         return $bytes;
     }
@@ -145,7 +128,7 @@ class FileUtil {
         return $size;
     }
 
-    public function formatDiscSize($bytes): string {
+    public function formatDiscSize(int $bytes): string {
         if ($bytes >= 1099511627776){
             $bytes = number_format($bytes / 1099511627776, 2) . ' TB';
         }elseif ($bytes >= 1073741824){
@@ -165,42 +148,18 @@ class FileUtil {
     }
 
     //------------------ copy, move, delete -------------------
-
-    /**
-     * @param $filenameFrom
-     * @param $filenameTo
-     * @throws \Exception
-     */
     public function copy($filenameFrom, $filenameTo): bool {
         if(!file_exists($filenameFrom)){
-            throw new \Exception('Neexistuje subor \'' . $filenameFrom . '\'!');
+            return false;
         }
-        if(file_exists($filenameTo)){
-            throw new \Exception('Subor \'' . $filenameTo . '\' uz existuje!');
-        }
-        $this->checkExtension($filenameTo);
-        if(!copy($filenameFrom, $filenameTo)){
-            throw new \Exception('Nepodarilo sa skopirovat subor \'' . $filenameFrom . '\' do \'' . $filenameTo . '\'!');
-        }
-        return true;
+        return copy($filenameFrom, $filenameTo);
     }
 
-    /**
-     * @param $filenameFrom
-     * @param $filenameTo
-     * @throws \Exception
-     */
-    public function move($filenameFrom, $filenameTo){
+    public function move(string $filenameFrom, string $filenameTo): bool {
         if(!file_exists($filenameFrom)){
-            throw new \Exception('Neexistuje subor \'' . $filenameFrom . '\'!');
+            return false;
         }
-        if(file_exists($filenameTo)){
-            throw new \Exception('Subor \'' . $filenameTo . '\' uz existuje!');
-        }
-        $this->checkExtension($filenameTo);
-        if(!rename($filenameFrom, $filenameTo)){
-            throw new \Exception('Nepodarilo sa presunut subor z \'' . $filenameFrom . '\' do \'' . $filenameTo . '\'!');
-        }
+        return rename($filenameFrom, $filenameTo);
     }
 
     /**
@@ -219,10 +178,7 @@ class FileUtil {
      * delete directory recursivelly
      */
     public function deleteDir(string $dir): bool {
-        $files = array_diff(scandir($dir), array('.','..'));
-        foreach ($files as $file) {
-            (is_dir($dir.'/'.$file)) ? $this->deleteDir($dir.'/'.$file) : unlink($dir.'/'.$file);
-        }
+        $this->emptyDir($dir);
         return rmdir($dir);
     }
 
@@ -290,18 +246,11 @@ class FileUtil {
 
     //------------------ generateRandomFilename -------------------
     /**
-     * TODO pouzitie nahradit cez UUID
      * Vygeneruje nahodny filename (aky este neexistuje).
-     * @param $path
-     * @param $extension
-     * @return string
      */
-    public function generateRandomFilename($path, $extension) : string {
-        do{
-            $extension2 = empty($extension) ? '' : '.' . $extension;
-            $filename = $path . '/' . uniqid('', true) . mt_rand() . $extension2;
-        }while(file_exists($filename));
-        return $filename;
+    public function generateRandomFilename(string $path, string $extension) : string {
+        $extension = empty($extension) ? '' : '.' . $extension;
+        return $path . '/' . Uuid::v4()->toRfc4122() . $extension;
     }
 
     //------------------ filePutContents -------------------
@@ -311,6 +260,7 @@ class FileUtil {
      * @param int $flags
      * @return bool|int
      * @throws \Exception
+     * @deprecated [12.1.2021] toto vymazat... nema zmysel tato metoda
      */
     public function filePutContents($filename, $data, $flags = 0){
         $this->checkExtension($filename);
@@ -321,15 +271,11 @@ class FileUtil {
     }
 
     /**
-     * @param $path
      * @param $extension - bez bodky
-     * @param $data
-     * @param int $flags
-     * @throws \Exception
      */
-    public function generateRandomFilenameAndPutContents($path, $extension, $data, $flags = 0): string {
+    public function generateRandomFilenameAndPutContents(string $path, string $extension, string $data, int $flags = 0): string {
         $filename = $this->generateRandomFilename($path, $extension);
-        $this->filePutContents($filename, $data);
+        file_put_contents($filename, $data, $flags);
         return $filename;
     }
 
@@ -339,16 +285,13 @@ class FileUtil {
      * @param $filename - filename aj s cestou
      * @param $filenameClient - filename pre clienta
      */
-    public function download($filename, $filenameClient): Response {
-        // response
+    public function download(string $filename, string $filenameClient): Response {
         $response = new Response();
-        // header
         $response->headers->set('Cache-Control', 'private');
         $response->headers->set('Content-type', $this->getMimeType($filename));
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filenameClient . '";');
         $response->headers->set('Content-length', filesize($filename));
-        // send header before outputting anything
-        $response->sendHeaders();
+        $response->sendHeaders(); // send header before outputting anything
         $response->setContent(file_get_contents($filename));
         return $response;
     }
@@ -364,15 +307,12 @@ class FileUtil {
      * download
      */
     public function downloadByContentMimeType($fileContent, $mimeType, $filenameClient):Response{
-        // response
         $response = new Response();
-        // header
         $response->headers->set('Cache-Control', 'private');
         $response->headers->set('Content-type', $mimeType);
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filenameClient . '";');
         $response->headers->set('Content-length', strlen($fileContent));
-        // send header before outputting anything
-        $response->sendHeaders();
+        $response->sendHeaders(); // send header before outputting anything
         $response->setContent($fileContent);
         return $response;
     }
@@ -410,37 +350,14 @@ class FileUtil {
      * $basePath - without '/' at the end
      */
     public function createDirsForUuid4(string $basePath, string $uuid, bool $includeUUidDir = true):string{
-        $dirPart1 = $uuid[0].$uuid[1];
-        $dirPart2 = $uuid[2].$uuid[3];
-        $dirPart3 = $uuid[4].$uuid[5];
-        $dirPart4 = $uuid[6].$uuid[7];
+        $path = $this->createUuidBasePath($basePath, $uuid);
+        $this->mkdirIfNotExists($path);
 
-        $basePath .= '/'.$dirPart1;
-        if(!$this->isDir($basePath)){
-            $this->createDir($basePath);
-        }
-
-        $basePath .= '/'.$dirPart2;
-        if(!$this->isDir($basePath)){
-            $this->createDir($basePath);
-        }
-
-        $basePath .= '/'.$dirPart3;
-        if(!$this->isDir($basePath)){
-            $this->createDir($basePath);
-        }
-
-        $basePath .= '/'.$dirPart4;
-        if(!$this->isDir($basePath)){
-            $this->createDir($basePath);
-        }
         if($includeUUidDir){
-            $basePath .= '/'.$uuid;
-            if(!$this->isDir($basePath)){
-                $this->createDir($basePath);
-            }
+            $path .= '/'.$uuid;
+            $this->mkdirIfNotExists($path);
         }
-        return $basePath;
+        return $path;
     }
 
     /**
@@ -451,8 +368,8 @@ class FileUtil {
         $dirPart2 = $uuid[2].$uuid[3];
         $dirPart3 = $uuid[4].$uuid[5];
         $dirPart4 = $uuid[6].$uuid[7];
-
         $path = $basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4;
+
         if($this->isDir($path) && $this->isEmptyDir($path)){
             rmdir($path);
         }
@@ -474,23 +391,22 @@ class FileUtil {
     }
 
     public function getPathByUuid(string $basePath, string $uuid, bool $includeUuidDir = true): ?string {
-        $dirPart1 = $uuid[0] . $uuid[1];
-        $dirPart2 = $uuid[2] . $uuid[3];
-        $dirPart3 = $uuid[4] . $uuid[5];
-        $dirPart4 = $uuid[6] . $uuid[7];
-
-        $path = $basePath . '/' . $dirPart1 . '/' . $dirPart2 . '/' . $dirPart3 . '/' . $dirPart4;
+        $path = $this->createUuidBasePath($basePath, $uuid);
         if($includeUuidDir){
             $path .= '/' . $uuid;
         }
         return $this->isDir($path) ? $path : null;
     }
-    
-    /**
-     * @param $file
-     * @param $text
-     */
-    public function writeToEnd($file, $text){
+
+    private function createUuidBasePath(string $basePath, string $uuid): string {
+        $dirPart1 = $uuid[0] . $uuid[1];
+        $dirPart2 = $uuid[2] . $uuid[3];
+        $dirPart3 = $uuid[4] . $uuid[5];
+        $dirPart4 = $uuid[6] . $uuid[7];
+        return $basePath . '/' . $dirPart1 . '/' . $dirPart2 . '/' . $dirPart3 . '/' . $dirPart4;
+    }
+
+    public function writeToEnd(string $file, string $text):void{
         if($handle = fopen($file, 'a')){
             fwrite($handle, $text);
             fclose($handle);

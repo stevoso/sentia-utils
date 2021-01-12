@@ -1,15 +1,13 @@
 <?php
 namespace Sentia\Utils;
 
+use Iterator;
 use NoRewindIterator;
 use SplFileObject;
 
 class BigFileUtil{
 
     protected ?SplFileObject $file;
-
-    public function __construct(){
-    }
 
     public function load(string $filename, string $mode = "r"):void{
         if (!file_exists($filename)) {
@@ -22,7 +20,7 @@ class BigFileUtil{
         return $this->file !== null;
     }
 
-    protected function iterateText(){
+    protected function iterateText(): Iterator {
         $count = 0;
         while (!$this->file->eof()) {
             yield $this->file->fgets();
@@ -31,15 +29,16 @@ class BigFileUtil{
         return $count;
     }
 
-    protected function iterateBinary(int $bytes){
+    protected function iterateBinary(int $bytes): Iterator {
         $count = 0;
         while (!$this->file->eof()) {
             yield $this->file->fread($bytes);
             $count++;
         }
+        return $count;
     }
 
-    public function iterate(string $type = "Text", $bytes = NULL){
+    public function iterate(string $type = "Text", $bytes = null): NoRewindIterator {
         if ($type == "Text") {
             return new NoRewindIterator($this->iterateText());
         } else {

@@ -5,11 +5,6 @@ use DateTime;
 use Exception;
 
 class DateTimeUtil {
-    /**
-     * DateTimeUtil constructor.
-     */
-    public function __construct(){
-    }
 
     /**
      * porovnava datumy - pouziva objekty DateTime, ale berie do uvahy len 'd m Y'
@@ -39,9 +34,8 @@ class DateTimeUtil {
      * vracia vek podla datumu narodenia k dnesnemu dnu, alebo k nejaku inemu dnu
      * @param DateTime $birthDate
      * @param DateTime|null $toDate - datum, ku ktoremu pocitat vek
-     * @return float
      */
-    public function getAge(DateTime $birthDate = null, DateTime $toDate = null){
+    public function getAge(DateTime $birthDate = null, DateTime $toDate = null): ?int {
         $ret = null;
         if(null !== $birthDate){
             if($toDate === null){
@@ -77,7 +71,11 @@ class DateTimeUtil {
         if (!($d>=1 && $d<=31 && $m>=1 && $m<=12 && $y>=1900 && $y<=2200)){
             return null;
         }
-        $d = new DateTime($y.'-'.($m<=9 ? '0' : '').$m.'-'.($d<=9 ? '0' : '').$d);
+        try{
+            $d = new DateTime($y . '-' . ($m <= 9 ? '0' : '') . $m . '-' . ($d <= 9 ? '0' : '') . $d);
+        }catch(Exception $e){
+
+        }
         return $d;
     }
 
@@ -163,7 +161,7 @@ class DateTimeUtil {
         return $dateTime;
     }
 
-    public function getHoursForForm(){
+    public function getHoursForForm(): array {
         $ret = [];
         for($i=0; $i<=23; $i++){
             $h = str_pad($i, 2, "0", STR_PAD_LEFT);
@@ -172,7 +170,7 @@ class DateTimeUtil {
         return $ret;
     }
 
-    public function getMinutesForForm(){
+    public function getMinutesForForm(): array {
         $ret = [];
         for($i=0; $i<=59; $i++){
             $m = str_pad($i, 2, "0", STR_PAD_LEFT);

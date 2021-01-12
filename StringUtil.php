@@ -4,6 +4,9 @@ namespace Sentia\Utils;
 use Exception;
 
 class StringUtil {
+    /**
+     * @deprecated [12.1.2021] tuto konstantu dat prec
+     */
     const PASSWORD_STRENGTH_WARNING = "Heslo musí byť aspoň 8 znakov dlhé, musí obsahovať číslo a písmeno";
 
     public function toUpper(string $string):string{
@@ -20,46 +23,38 @@ class StringUtil {
 
     /**
      * konvertuje CP1250 na UTF8
-     * @param $theString
-     * @return string
-     * @throws Exception
      */
-    public function cp1250ToUtf8($theString){
+    public function cp1250ToUtf8($string): ?string {
         try {
-            if (($s = iconv('CP1250', 'UTF-8//TRANSLIT', $theString)) === false){
-                throw new Exception('Neda sa previest string ('.$theString.') na utf8!');
+            if (($s = iconv('CP1250', 'UTF-8//TRANSLIT', $string)) === false){
+                throw new Exception('Neda sa previest string ('.$string.') na utf8!');
             }
+            return $s;
         } catch (Exception $e) {
-            throw new Exception('Doslo k chybe v \'ToUtf8\'! Neda sa previest string ('.$theString.') na utf8!'. PHP_EOL. $e->getMessage(), NULL, $e);
+            return null;
         }
-        return $s;
     }
 
     /**
      * konvertuje UTF na CP1250
-     * @param $theString
-     * @return string
-     * @throws Exception
      */
-    public function utf8ToCp1250($theString){
-        $theString = str_replace('ȍ', 'o', $theString);
-        if (($s = iconv('UTF-8', 'CP1250//TRANSLIT', $theString)) === false){
-            throw new Exception('Neda sa previest string ('.$theString.') na cp1250!');
+    public function utf8ToCp1250($string): ?string {
+        $string = str_replace('ȍ', 'o', $string);
+        if (($s = iconv('UTF-8', 'CP1250//TRANSLIT', $string)) === false){
+            return null;
         }
-        if (strlen($theString) > 0 && strlen($s)==0){
-            throw new Exception('Neda sa previest retazec ('.$theString.') na cp1250 (skuste pouzit iba znaky z eng/svk klavesnice)!');
+        if (strlen($string) > 0 && strlen($s)==0){
             // ak nastane tato chyba - pravdepodobne niekto zadal do formulara znak z nemeckej/... klavesnice
             // potom by slo este pouzit //TRANSLIT//IGNORE, co sa pokusi skonvertovat, pripadne zignoruje problematicke znaky.
+            return null;
         }
         return $s;
     }
 
     /**
      * string to Ascii (odstranenie diakritiky)
-     * @param $string
-     * @return string
      */
-    public function utf8ToAscii($string){
+    public function utf8ToAscii(string $string): string {
         //return iconv("UTF-8", "ASCII//TRANSLIT", $string);
         $prevodni_tabulka = [
             'ä'=>'a',
@@ -147,7 +142,6 @@ class StringUtil {
             'ź'=>'z',
             'Ź'=>'Z'
         ];
-
         return strtr($string, $prevodni_tabulka);
     }
 
@@ -162,12 +156,8 @@ class StringUtil {
     /**
      * za retazec doplni zvoleny znak na celkovu zvolenu dlzku
      * pred String prida Chars, aby vysledna dlzka bola LengthRequired (a vrati taky string).
-     * @param $string
-     * @param $char
-     * @param $lengthRequired
-     * @return string
      */
-    public function appendChars($string, $char, $lengthRequired){
+    public function appendChars(string $string, string $char, int $lengthRequired):string{
         return str_pad($string, $lengthRequired, $char, STR_PAD_RIGHT);
     }
 
@@ -200,11 +190,8 @@ class StringUtil {
     /**
      * vracia true, ak salt+heslo sa rovna hash-u
      * @param $rawStringToVerify - heslo v surovej forme (nehashovane), ktore sa ma porovnat s hashom
-     * @param $salt
-     * @param $hash
-     * @return bool
      */
-    public function isPasswordVerified($rawStringToVerify, $salt, $hash){
+    public function isPasswordVerified(string $rawStringToVerify, string $salt, string $hash): bool {
         return password_verify($salt.$rawStringToVerify, $hash);
     }
 
@@ -212,6 +199,7 @@ class StringUtil {
      * vracia true, ak heslo splna nizsie uvedene podmienky
      * @param $passwordRaw
      * @return bool
+     * @deprecated [12.1.2021] Tato metoda by tu nemala byt v utiloch.
      */
     public function hasPasswordMinStrength($passwordRaw){
         return !(
@@ -222,17 +210,17 @@ class StringUtil {
         );
     }
 
-    public function isEmail($string){
+    public function isEmail(string $string): bool {
         return filter_var($string, FILTER_VALIDATE_EMAIL);
     }
 
-    public function toSafeNumber(?string $string, $ifEmpty = 0):?string{
+    public function toSafeNumber(?string $string, string $valueIfEmpty = '0'):?string{
         if($string === null){
             return null;
         }
         $string = str_replace([',', ' '], ['.', ''], $string);
         if(empty($string)){
-            $string = $ifEmpty;
+            $string = $valueIfEmpty;
         }
         return $string;
     }
