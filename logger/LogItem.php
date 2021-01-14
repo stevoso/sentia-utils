@@ -24,7 +24,7 @@ class LogItem {
     public string $ip;
     public string $title;
     public ?DateTime $dateTime;
-    public string $message = '';
+    public ?string $message = '';
 
     public function toArray(): array {
         return [

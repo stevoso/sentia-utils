@@ -19,37 +19,55 @@ class Logger {
         $this->dateTimeUtil = $dateTimeUtil;
     }
 
+    // ### log by LogItem ###
+    public function addLogByDate(string $basePath, Uuid $uuid, LogItem $log): void {
+        if($log->lineType === LogItem::LINE_ONE){
+            $this->addLineByDate($basePath, $uuid, $log->title, $log->message, $log->type);
+        }else{
+            $this->addLinesByDate($basePath, $uuid, $log->title, $log->message, $log->type);
+        }
+    }
+
+    public function addLogByUuid(string $basePath, Uuid $uuid, LogItem $log): void {
+        if($log->lineType === LogItem::LINE_ONE){
+            $this->addLineByUuid($basePath, $uuid, $log->title, $log->message, $log->type);
+        }else{
+            $this->addLinesByUuid($basePath, $uuid, $log->title, $log->message, $log->type);
+        }
+    }
+
+
     // ### log by date ###
-    public function addLineByDate(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+    public function addLineByDate(string $basePath, Uuid $uuid, string $title, ?string $message, int $type = LogItem::TYPE_DEFAULT): void {
         $this->logByDate($title, $message, $uuid, LogItem::LINE_ONE, $type, $basePath);
     }
 
-    public function addLinesByDate(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+    public function addLinesByDate(string $basePath, Uuid $uuid, string $title, ?string $message, int $type = LogItem::TYPE_DEFAULT): void {
         $this->logByDate($title, $message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
     }
 
-    private function logByDate(string $title, string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
+    private function logByDate(string $title, ?string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
         $logItem = $this->prepareLogItem($title, $message, $lineType, $type, $basePath);
         // prepare subdirs by Uuid
         $finalPath = $this->fileUtil->createDirsForUuid4($basePath, $uuid->toRfc4122());
         $finalPath .= '/'.$logItem->dateTime->format('Y');
         if(!is_dir($finalPath)){
-            $this->fileUtil->createDir($finalPath);
+            $this->fileUtil->mkdirIfNotExists($finalPath);
         }
         $finalPath .= '/'.$logItem->dateTime->format("m-d").'.log';
         file_put_contents($finalPath, $logItem->generateLogItem(), FILE_APPEND | LOCK_EX);
     }
 
     // ### log by UUID ###
-    public function addLineByUuid(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+    public function addLineByUuid(string $basePath, Uuid $uuid, string $title, ?string $message, int $type = LogItem::TYPE_DEFAULT): void {
         $this->logByUuid($title, $message, $uuid, LogItem::LINE_ONE, $type, $basePath);
     }
 
-    public function addLinesByUuid(string $basePath, Uuid $uuid, string $title, string $message, int $type = LogItem::TYPE_DEFAULT): void {
+    public function addLinesByUuid(string $basePath, Uuid $uuid, string $title, ?string $message, int $type = LogItem::TYPE_DEFAULT): void {
         $this->logByUuid($title, $message, $uuid, LogItem::LINE_MULTI, $type, $basePath);
     }
 
-    private function logByUuid(string $title, string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
+    private function logByUuid(string $title, ?string $message, Uuid $uuid, int $lineType, int $type, string $basePath): void{
         $logItem = $this->prepareLogItem($title, $message, $lineType, $type, $basePath);
         // prepare subdirs by Uuid
         $finalPath = $this->fileUtil->createDirsForUuid4($basePath, $uuid->toRfc4122(), false);
@@ -57,7 +75,7 @@ class Logger {
         file_put_contents($finalPath, $logItem->generateLogItem(), FILE_APPEND | LOCK_EX);
     }
 
-    private function prepareLogItem(string $title, string $message, int $lineType, int $type, string $basePath):LogItem{
+    private function prepareLogItem(string $title, ?string $message, int $lineType, int $type, string $basePath):LogItem{
         $logItem = new LogItem();
         $logItem->title = $title;
         $logItem->message = $message;
