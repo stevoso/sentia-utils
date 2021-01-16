@@ -194,4 +194,17 @@ class DateTimeUtil {
         }
         return $ret;
     }
+
+    /**
+     * vracia DateTime vhodny na ukoncenie zmluvy.
+     * Ak je na vstupe dnesny datum, tak sa vrati aj aktualna casova zlozka
+     * Ak je na vstupe iny ako dnesny datum, tak casova zlozka bude 00:00:00
+     */
+    public function getForInsuranceStart(DateTime $dateTime): DateTime{
+        if($dateTime->format("Y-m-d") === date("Y-m-d")){
+            return new DateTime();
+        }else{
+            return new DateTime($dateTime->format("Y-m-d").'00:00:00');
+        }
+    }
 }
