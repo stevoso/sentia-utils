@@ -5,7 +5,10 @@ class VehicleUtil {
     /**
      * vracia true, ak $vin ma korektny format: musi mat 17 znakov a nesmie obsahovat znaky I, O, Q
      */
-    public function isVinValid(string $vin):bool{
+    public function isVinValid(?string $vin):bool{
+        if($vin === null){
+            return false;
+        }
         return (strlen($vin) == 17 && !strpos($vin, 'I') && !strpos($vin, 'O') && !strpos($vin, 'Q'));
     }
 
