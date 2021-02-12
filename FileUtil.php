@@ -395,7 +395,7 @@ class FileUtil {
         if($includeUuidDir){
             $path .= '/' . $uuid;
         }
-        return $this->isDir($path) ? $path : null;
+        return $path;
     }
 
     private function createUuidBasePath(string $basePath, string $uuid): string {
