@@ -24,6 +24,7 @@ class CryptUtil {
      * Decrypt a message (using sodium)
      */
     public function decrypt(string $encrypted, string $key):?string{
+        $key = hash('sha256', $key, true);
         $decoded = base64_decode($encrypted);
         if ($decoded === false) {
             return null;
