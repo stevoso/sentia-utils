@@ -9,6 +9,7 @@ class CryptUtil {
      */
     public function crypt(string $message, string $key):?string{
         try{
+            $key = hash('sha256', $key, true);
             $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
             $cipher = base64_encode($nonce . sodium_crypto_secretbox($message, $nonce, $key));
             sodium_memzero($message);

@@ -7,22 +7,12 @@ class JsonUtil {
         return json_encode($arr, JSON_UNESCAPED_UNICODE);
     }
 
-    /**
-     * @param $json
-     * @return mixed
-     */
-    public function jsonToArray($json){
+    public function jsonToArray($json): array {
         $arr = json_decode($json, true);
         return is_array($arr) ? $arr : [];
     }
 
-    /**
-     * @param $json
-     * @param $key
-     * @param $value
-     * @return string
-     */
-    public function addToJson($json, $key, $value){
+    public function addToJson($json, $key, $value): string {
         $arr = [];
         if(!empty($json)){
             $arr = $this->jsonToArray($json);
@@ -31,10 +21,6 @@ class JsonUtil {
         return $this->arrayToJson($arr);
     }
 
-    /**
-     * @param $json
-     * @param $key
-     */
     public function getItemFromJson($json, $key){
         $arr = $this->jsonToArray($json);
         return (isset($arr[$key]) ? $arr[$key] : null);
