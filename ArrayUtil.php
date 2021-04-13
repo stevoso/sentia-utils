@@ -91,6 +91,26 @@ class ArrayUtil {
     // --------------------------- get members --------------------------------
     /**
      * najprv sa pokusi zavolat $item->getMemberName() a ked sa nepodari, tak $item->memberName
+     * Vrati objekt, kde konkretny parameter ma konkretnu hodnotu
+     */
+    public function getObjectFromObjectsByValue(array $objects, string $memberName, $memberValue){
+        $ret = null;
+        $method = "get" . ucwords($memberName);
+        foreach($objects as $object){
+            try{
+                $value = $object->$method();
+            }catch(Exception $e){
+                $value = $object->$memberName;
+            }
+            if($value === $memberValue){
+                return $object;
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * najprv sa pokusi zavolat $item->getMemberName() a ked sa nepodari, tak $item->memberName
      */
     public function getMembersFromObjects(array $objects, string $memberName): array {
         $ret = [];
