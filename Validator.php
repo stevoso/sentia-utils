@@ -18,4 +18,11 @@ class Validator {
         return preg_match(self::NON_SLOVAK_PHONE_REGEX, $phone);
     }
 
+    public function isLatitude(?string $latitude): bool {
+        return preg_match('/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/', $latitude);
+    }
+
+    public function isLongitude(?string $longitude): bool {
+        return preg_match('/^[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/', $longitude);
+    }
 }
