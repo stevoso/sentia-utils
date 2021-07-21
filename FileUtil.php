@@ -363,13 +363,20 @@ class FileUtil {
     /**
      * use this method if uuid file is deleted. Empty folders will be deleted
      */
-    public function clearUuid4Dirs(string $basePath, string $uuid):void{
+    public function clearUuid4Dirs(string $basePath, string $uuid, bool $includeUuidDir = true):void{
         $dirPart1 = $uuid[0].$uuid[1];
         $dirPart2 = $uuid[2].$uuid[3];
         $dirPart3 = $uuid[4].$uuid[5];
         $dirPart4 = $uuid[6].$uuid[7];
-        $path = $basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4;
 
+        if($includeUuidDir){
+            $path = $basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4.'/'.$uuid;
+            if($this->isDir($path) && $this->isEmptyDir($path)){
+                rmdir($path);
+            }
+        }
+
+        $path = $basePath.'/'.$dirPart1.'/'.$dirPart2.'/'.$dirPart3.'/'.$dirPart4;
         if($this->isDir($path) && $this->isEmptyDir($path)){
             rmdir($path);
         }
