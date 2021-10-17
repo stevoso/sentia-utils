@@ -1,6 +1,7 @@
 <?php
 namespace Sentia\Utils;
 
+use Exception;
 use FilesystemIterator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Uid\Uuid;
@@ -23,13 +24,13 @@ class FileUtil {
     //------------------ extension -------------------
     /**
      * @param $filename
-     * @throws \Exception
+     * @throws Exception
      */
     private function checkExtension($filename){
         $this->splitFilename($filename, $path, $baseName, $filename2, $extension);
         $extension = $this->stringUtils->toLower($extension);
         if($extension != '' && in_array($extension, self::$EXTENSIONS_FORBIDDEN)){
-            throw new \Exception('Nie je povolene vytvorit (kopirovat, premenovat) subor \'' . $baseName . '\' (pripona \'' . $extension . '\' je nepovolena)!');
+            throw new Exception('Nie je povolene vytvorit (kopirovat, premenovat) subor \'' . $baseName . '\' (pripona \'' . $extension . '\' je nepovolena)!');
         }
     }
     
@@ -67,7 +68,7 @@ class FileUtil {
     /**
      * vracia pole suborov, ktore vyhovuju pozadovanej koncovke suboru. Ak null, tak vracia vsetky subory. '.' a '..' sý vynechané.
      */
-    public function getFiles($dir, $expectedExtension = null): array {
+    public function getFiles(string $dir, ?string $expectedExtension = null): array {
         $filesDirs = $this->getFilesAndDirs($dir);
         $files = [];
         foreach($filesDirs as $fileDir){
@@ -211,13 +212,29 @@ class FileUtil {
     /**
      * na vstupe by mala byt validna adresarova cesta, napr: x/y/z/u
      * metoda skontroluje danu adresarovu struktutu a ak adresare neexistuju, tak sa vytvoria
+     * je tu tiez kontrola ked je v php nastavena nejaka hodnota 'open_basedir'
      */
     public function mkdirIfNotExists(string $dirPath): bool {
+        $baseDirString = ini_get('open_basedir');
+        $forbiddenDir = null;
+        if($baseDirString !== ''){
+            $baseDirs = explode(':', $baseDirString);
+            foreach($baseDirs as $baseDir){
+                if(substr($dirPath, 0, strlen($baseDir)) === $baseDir){
+                    $forbiddenDir = $baseDir;
+                    break;
+                }
+            }
+        }
+
         $parts = explode('/', $dirPath);
         if(($count = count($parts)) > 1){
             $path = $parts[0];
             for($i=1; $i<$count; $i++){
                 $path .= '/'.$parts[$i];
+                if($forbiddenDir !== null && substr($forbiddenDir, 0, strlen($path)) === $path){
+                    continue;
+                }
                 if(!is_dir($path) && !mkdir($path)){
                     return false;
                 }
@@ -259,13 +276,13 @@ class FileUtil {
      * @param $data
      * @param int $flags
      * @return bool|int
-     * @throws \Exception
+     * @throws Exception
      * @deprecated [12.1.2021] toto vymazat... nema zmysel tato metoda
      */
     public function filePutContents($filename, $data, $flags = 0){
         $this->checkExtension($filename);
         if(($bytes = file_put_contents($filename, $data, $flags)) === false){
-            throw new \Exception('Padlo file_put_contents() \'' . $filename . '\'!');
+            throw new Exception('Padlo file_put_contents() \'' . $filename . '\'!');
         }
         return $bytes;
     }
