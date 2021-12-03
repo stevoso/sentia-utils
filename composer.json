@@ -24,8 +24,8 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
-        "symfony/uid": "^5.2",
-        "symfony/http-foundation": "^5.2",
+        "symfony/uid": "*",
+        "symfony/http-foundation": "*",
         "ext-curl": "*",
         "ext-fileinfo": "*"
     }
