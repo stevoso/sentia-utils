@@ -34,7 +34,7 @@ class VehicleUtil {
         return $ret;
     }
 
-    public function getDimensionAndTypeOfTyreAxle(string $dimensionAndTypeOfTyreAxle): array {
+    public function getDimensionAndTypeOfTyreAxle(?string $dimensionAndTypeOfTyreAxle): array {
         $res = [];
         if ($dimensionAndTypeOfTyreAxle == null || $dimensionAndTypeOfTyreAxle == '') {
             return $res;
@@ -88,7 +88,7 @@ class VehicleUtil {
         return $res;
     }
 
-    public function getRimDimensionsOnAxle(string $rimDimensionsOnAxle): array {
+    public function getRimDimensionsOnAxle(?string $rimDimensionsOnAxle): array {
         $res = [];
         if ($rimDimensionsOnAxle == null || $rimDimensionsOnAxle == '') {
             return $res;
@@ -127,10 +127,10 @@ class VehicleUtil {
                 }
             }
         }
-        $res['width'] = isset($res['width']) ? $res['width'] : null;
-        $res['rimEdgeShape'] = isset($res['rimEdgeShape']) ? $res['rimEdgeShape'] : null;
-        $res['diskDiameter'] = isset($res['diskDiameter']) ? $res['diskDiameter'] : null;
-        $res['offset'] = isset($res['offset']) ? $res['offset'] : null;
+        $res['width'] = $res['width'] ?? null;
+        $res['rimEdgeShape'] = $res['rimEdgeShape'] ?? null;
+        $res['diskDiameter'] = $res['diskDiameter'] ?? null;
+        $res['offset'] = $res['offset'] ?? null;
         $res['name'] = $rimDimensionsOnAxle;
         return $res;
     }
