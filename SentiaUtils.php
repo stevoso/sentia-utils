@@ -21,7 +21,6 @@ class SentiaUtils
     public LangUtil $lang;
     public Logger $logger;
     public Payme $payme;
-    public PdoUtil $pdo;
     public PersonUtil $person;
     public StopWatch $stopWatch;
     public StringUtil $string;
@@ -33,7 +32,7 @@ class SentiaUtils
 
     public function __construct(ArrayUtil $arrayUtil, BigFileUtil $bigFileUtil, BitUtil $bitUtil, CryptUtil $cryptUtil, CsvUtil $csvUtil,
                                 DateTimeUtil $dateTimeUtil, FileUtil $fileUtil, FileUpload $fileUpload, HolidaysUtil $holidaysUtil, ImageUtil $image,
-                                JwtUtil $jwtUtil, LangUtil $langUtil, Logger $logger, Payme $payme, PdoUtil $pdoUtil, PersonUtil $personUtil,
+                                JwtUtil $jwtUtil, LangUtil $langUtil, Logger $logger, Payme $payme, PersonUtil $personUtil,
                                 JsonUtil $jsonUtil, StopWatch $stopWatch, StringUtil $stringUtil, Validator $validtor,
                                 ValidatorExternal $validatorExternal, VehicleUtil $vehicleUtil, WebUtil $webUtil, ZipUtil $zipUtil){
         $this->array = $arrayUtil;
@@ -51,7 +50,6 @@ class SentiaUtils
         $this->lang = $langUtil;
         $this->logger = $logger;
         $this->payme = $payme;
-        $this->pdo = $pdoUtil;
         $this->person = $personUtil;
         $this->stopWatch = $stopWatch;
         $this->string = $stringUtil;
